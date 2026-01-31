@@ -19,11 +19,17 @@ public class ImageCompressorService(ICoreService core)
             return new CompressionResult();
         }
 
-        var imageFiles = GetImageFiles(imagesPath);
+        // Get only changed/added images in the current commit/PR
+        var changedImageFiles = GitHelper.GetChangedImageFiles();
+
+        // Filter to only files in the specified images path
+        var imageFiles = changedImageFiles
+            .Where(f => f.StartsWith(imagesPath, StringComparison.OrdinalIgnoreCase))
+            .ToList();
 
         if (imageFiles.Count == 0)
         {
-            _core.WriteInfo("No images found to compress.");
+            _core.WriteInfo("No changed images found to compress.");
             return new CompressionResult();
         }
 
@@ -43,13 +49,6 @@ public class ImageCompressorService(ICoreService core)
             saved {FileHelper.FormatBytes(result.TotalBytesSaved)} total");
 
         return result;
-    }
-
-    private static List<string> GetImageFiles(string imagesPath)
-    {
-        var imageExtensions = new[] { ".jpg", ".jpeg", ".png" };
-        return [.. Directory.GetFiles(imagesPath, "*.*", SearchOption.AllDirectories)
-            .Where(f => imageExtensions.Contains(Path.GetExtension(f).ToLower()))];
     }
 
     private async Task ProcessImageAsync(string imagePath, int quality, int maxWidth, CompressionResult result)
