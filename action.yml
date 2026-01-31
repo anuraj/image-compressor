@@ -1,0 +1,38 @@
+name: 'Image Compressor'
+description: 'Compresses images in Jekyll posts'
+inputs:
+  images-path:
+    description: 'Path to images folder'
+    required: false
+    default: 'assets/images'
+  quality:
+    description: 'Compression quality (1-100)'
+    required: false
+    default: '85'
+  max-width:
+    description: 'Maximum width in pixels (0 to skip resize)'
+    required: false
+    default: '1920'
+outputs:
+  compressed-count:
+    description: 'Number of images compressed'
+    value: ${{ steps.compress.outputs.compressed-count }}
+  saved-bytes:
+    description: 'Total bytes saved'
+    value: ${{ steps.compress.outputs.saved-bytes }}
+runs:
+  using: 'composite'
+  steps:
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '10.0.x'
+    
+    - name: Compress Images
+      id: compress
+      shell: bash
+      run: |
+        dotnet run --project ${{ github.action_path }}/src/ImageCompressor.csproj -- \
+          --path "${{ inputs.images-path }}" \
+          --quality ${{ inputs.quality }} \
+          --max-width ${{ inputs.max-width }}
