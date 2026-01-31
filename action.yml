@@ -1,5 +1,8 @@
 name: 'Image Compressor'
 description: 'Compresses images in Jekyll posts'
+branding:
+  color: 'gray-dark'
+  icon: 'minimize'
 inputs:
   images-path:
     description: 'Path to images folder'
