@@ -2,6 +2,8 @@
 
 A high-performance GitHub Action that automatically compresses and optimizes images in your Jekyll blog, reducing file sizes and improving page load times without sacrificing visual quality.
 
+**v1.1 Now Available**: Smart change detection - only compresses images added or modified in your PR/commit!
+
 [![.NET 10.0](https://img.shields.io/badge/.NET-10.0-512BD4?logo=dotnet)](https://dotnet.microsoft.com/)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
@@ -16,6 +18,7 @@ A high-performance GitHub Action that automatically compresses and optimizes ima
 - **Zero Manual Work**: Automatically compresses images in every commit or pull request
 - **Smart Compression**: Uses industry-leading ImageSharp library for optimal results
 - **Format-Specific**: Tailored compression strategies for JPEG and PNG files
+- **Efficient Processing**: Only processes changed/added images - saves time and resources
 
 ### Flexible & Powerful
 - **Configurable Quality**: Choose between maximum compression or highest visual quality
@@ -46,7 +49,7 @@ jobs:
       - uses: actions/checkout@v4
       
       - name: Compress Images
-        uses: anuraj/image-compressor@v1
+        uses: anuraj/image-compressor@v1.1
         with:
           images-path: 'assets/images'
           quality: 85
@@ -65,7 +68,7 @@ jobs:
 
 ```yaml
 - name: Compress Images (High Quality)
-  uses: anuraj/image-compressor@v1
+  uses: anuraj/image-compressor@v1.1
   with:
     images-path: 'assets/images'
     quality: 90        # Higher quality
@@ -76,7 +79,7 @@ jobs:
 
 ```yaml
 - name: Compress Images (Maximum Compression)
-  uses: anuraj/image-compressor@v1
+  uses: anuraj/image-compressor@v1.1
   with:
     images-path: 'assets/images'
     quality: 75        # More compression
@@ -87,7 +90,7 @@ jobs:
 
 ```yaml
 - name: Compress Images (No Resize)
-  uses: anuraj/image-compressor@v1
+  uses: anuraj/image-compressor@v1.1
   with:
     images-path: 'assets/images'
     quality: 85
@@ -101,7 +104,7 @@ The action provides useful metrics you can use in subsequent steps:
 ```yaml
 - name: Compress Images
   id: compress
-  uses: anuraj/image-compressor@v1
+  uses: anuraj/image-compressor@v1.1
 
 - name: Show Compression Stats
   run: |
@@ -142,7 +145,7 @@ jobs:
       
       - name: Compress Images
         id: compress
-        uses: anuraj/image-compressor@v1
+        uses: anuraj/image-compressor@v1.1
         with:
           images-path: 'assets/images'
           quality: 85
@@ -187,6 +190,7 @@ src/
 Each component has a single, well-defined responsibility:
 - **CommandLineHandler**: Manages CLI interface and option parsing
 - **ImageCompressorService**: Handles image processing and compression
+- **GitHelper**: Detects changed/added images in commits and PRs
 - **FileHelper**: Provides utility functions for file operations
 - **CompressionResult**: Encapsulates compression statistics
 
@@ -217,12 +221,13 @@ public class ImageCompressorService
 - **Resizing**: Maintains aspect ratio when resizing to maximum width
 
 **3. Processing Pipeline**
-
-1. **Discovery**: Recursively scans directory for `.jpg`, `.jpeg`, and `.png` files
-2. **Analysis**: Records original file size for comparison
-3. **Transformation**: Resizes image if it exceeds maximum width
-4. **Compression**: Applies format-specific compression algorithms
-5. **Validation**: Compares file sizes and reports savings
+etection**: Uses git to identify only changed/added images in the current commit/PR
+2. **Filtering**: Filters results to match the specified images path
+3. **Analysis**: Records original file size for comparison
+4. **Transformation**: Resizes image if it exceeds maximum width
+5. **Compression**: Applies format-specific compression algorithms
+6. **Validation**: Compares file sizes and reports savings
+7. **Validation**: Compares file sizes and reports savings
 6. **Reporting**: Aggregates statistics and outputs results
 
 ### Performance Characteristics
@@ -234,9 +239,10 @@ public class ImageCompressorService
 
 ### Extensibility
 
-The modular architecture makes it easy to extend:
-
-- Add new image formats by extending `GetImageFiles()` and `CompressAndSaveImageAsync()`
+The modular architecture makes it easyCompressAndSaveImageAsync()`
+- Implement custom compression strategies by modifying `ImageCompressorService`
+- Add new CLI options through `CommandLineHandler`
+- Enhance git detection logic through `GitHelpiles()` and `CompressAndSaveImageAsync()`
 - Implement custom compression strategies by modifying `ImageCompressorService`
 - Add new CLI options through `CommandLineHandler`
 - Integrate additional image processing operations (watermarks, filters, etc.)
