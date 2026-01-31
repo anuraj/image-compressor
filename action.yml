@@ -1,4 +1,4 @@
-name: 'Image Compressor'
+name: 'Jekyll Image Compressor'
 description: 'Compresses images in Jekyll posts'
 branding:
   color: 'gray-dark'
